@@ -1,6 +1,8 @@
 import os.path as path
 import pyspark
 import pyspark.sql.functions as sparkFun
+import sys
+import time
 
 def writeDf(df, path):
     df.coalesce(1) \
@@ -10,7 +12,7 @@ def writeDf(df, path):
         .format("csv") \
         .save(path)
 
-def analyzeByFilter(df, outputFolder, x_min, x_max, y_min, y_max, timestep_min, timestep_max):
+def analyzeByFilter(df, x_min, x_max, y_min, y_max, timestep_min, timestep_max):
     filteredDf = df.filter((df.timestep >= timestep_min) & (df.timestep <= timestep_max) & (df.x >= x_min) & (df.x <= x_max) & (df.y >= y_min) & (df.y <= y_max)) \
         .withColumn('temp', sparkFun.lit(1))
 
@@ -27,9 +29,9 @@ def analyzeByFilter(df, outputFolder, x_min, x_max, y_min, y_max, timestep_min, 
 
     final = res.join(res2, ["temp"]).drop('temp')
 
-    writeDf(final, path.join(outputFolder, "filter_results"))
+    return final
 
-def analyzeByLaneAndHour(df, outputFolder):
+def analyzeByLaneAndHour(df):
     res = df.withColumn("hour", sparkFun.floor(df['timestep'] / 3600)) \
         .groupBy("lane", "hour") \
         .agg(sparkFun.min('speed'), sparkFun.avg('speed'), sparkFun.max('speed'), sparkFun.stddev('speed'), sparkFun.min('acceleration'), sparkFun.avg('acceleration'), sparkFun.max('acceleration'), sparkFun.stddev('acceleration'), sparkFun.min('odometer'), sparkFun.avg('odometer'), sparkFun.max('odometer'), sparkFun.stddev('odometer'), sparkFun.count_distinct('id').alias('unique_vehicles'))
@@ -43,7 +45,7 @@ def analyzeByLaneAndHour(df, outputFolder):
 
     final = res.join(res2, ["lane", "hour"]).orderBy(["lane", "hour"])
 
-    writeDf(final, path.join(outputFolder, "all_results"))
+    return final
 
 if __name__ == "__main__":
     if len(sys.argv) < 9:
@@ -56,8 +58,9 @@ if __name__ == "__main__":
     y_min = sys.argv[5]
     y_max = sys.argv[6]
     time_min = sys.argv[7]
-    time_max = sys_argv[8]
+    time_max = sys.argv[8]
 
+    start = time.time()
     spark = pyspark.sql.SparkSession \
         .builder \
         .appName("Python Spark SQL Vienna Analysis") \
@@ -68,7 +71,13 @@ if __name__ == "__main__":
         .option('inferSchema', True) \
         .csv(dataSetFilePath)
 
-    analyzeByLaneAndHour(df, outputPath)
-    analyzeByFilter(df, outputPath, x_min=x_min, x_max=x_min, y_min=y_min, y_max=y_max, timestep_min=time_min, timestep_max=time_max)
+    resultAll = analyzeByLaneAndHour(df)
+    writeDf(resultAll, path.join(outputPath, "all_results"))
+
+    resultFilter = analyzeByFilter(df, x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max, timestep_min=time_min, timestep_max=time_max)  
+    writeDf(resultFilter, path.join(outputPath, "filter_results"))
 
     spark.stop()
+
+    end = time.time()
+    print(f"The amount of time execute this job: {end-start}s")
