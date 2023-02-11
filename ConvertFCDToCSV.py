@@ -20,7 +20,7 @@ lineCount = 0
 print("Processing...")
 start = time.time()
 
-with open(csvDataFilePath, 'w') as csvFile:
+with open(csvDataFilePath, 'w', newline='') as csvFile:
     csvWriter = csv.writer(csvFile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
     lineCount = FCDXMLHandler.parseFCDFile(xmlDataFilePath, csvWriter.writerow, csvWriter.writerow)
 
