@@ -1,0 +1,2 @@
+min(speed),avg(speed),max(speed),stddev_samp(speed),min(acceleration),avg(acceleration),max(acceleration),stddev_samp(acceleration),min(odometer),avg(odometer),max(odometer),stddev_samp(odometer),unique_vehicles,bus_bus,motorcycle_motorcycle,truck_truck,veh_passenger
+0.0,6.948437202965588,18.33,4.655177997757254,-10.0,0.0179744629617895,5.98,1.3360183155483332,0.0,1081.1391318674353,4375.94,788.9499646196753,459,64,65,139,191
