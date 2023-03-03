@@ -18,7 +18,19 @@ def analyzeByFilter(df, x_min, x_max, y_min, y_max, timestep_min, timestep_max):
 
     res = filteredDf \
         .groupBy("temp") \
-        .agg(sparkFun.min('speed'), sparkFun.avg('speed'), sparkFun.max('speed'), sparkFun.stddev('speed'), sparkFun.min('acceleration'), sparkFun.avg('acceleration'), sparkFun.max('acceleration'), sparkFun.stddev('acceleration'), sparkFun.min('odometer'), sparkFun.avg('odometer'), sparkFun.max('odometer'), sparkFun.stddev('odometer'), sparkFun.count_distinct('id').alias('unique_vehicles'))
+        .agg((sparkFun.min('speed'), 
+            sparkFun.avg('speed'), 
+            sparkFun.max('speed'), 
+            sparkFun.stddev('speed'), 
+            sparkFun.min('acceleration'), 
+            sparkFun.avg('acceleration'), 
+            sparkFun.max('acceleration'), 
+            sparkFun.stddev('acceleration'), 
+            sparkFun.min('odometer'), 
+            sparkFun.avg('odometer'), 
+            sparkFun.max('odometer'), 
+            sparkFun.stddev('odometer'), 
+            sparkFun.count_distinct('id').alias('unique_vehicles')))
 
     res2 = filteredDf \
         .groupBy("temp", "type") \
@@ -34,7 +46,19 @@ def analyzeByFilter(df, x_min, x_max, y_min, y_max, timestep_min, timestep_max):
 def analyzeByLaneAndHour(df):
     res = df.withColumn("hour", sparkFun.floor(df['timestep'] / 3600)) \
         .groupBy("lane", "hour") \
-        .agg(sparkFun.min('speed'), sparkFun.avg('speed'), sparkFun.max('speed'), sparkFun.stddev('speed'), sparkFun.min('acceleration'), sparkFun.avg('acceleration'), sparkFun.max('acceleration'), sparkFun.stddev('acceleration'), sparkFun.min('odometer'), sparkFun.avg('odometer'), sparkFun.max('odometer'), sparkFun.stddev('odometer'), sparkFun.count_distinct('id').alias('unique_vehicles'))
+        .agg((sparkFun.min('speed'), 
+            sparkFun.avg('speed'), 
+            sparkFun.max('speed'), 
+            sparkFun.stddev('speed'), 
+            sparkFun.min('acceleration'), 
+            sparkFun.avg('acceleration'), 
+            sparkFun.max('acceleration'), 
+            sparkFun.stddev('acceleration'), 
+            sparkFun.min('odometer'), 
+            sparkFun.avg('odometer'), 
+            sparkFun.max('odometer'), 
+            sparkFun.stddev('odometer'), 
+            sparkFun.count_distinct('id').alias('unique_vehicles')))
 
     res2 = df.withColumn("hour", sparkFun.floor(df['timestep'] / 3600)) \
         .groupBy("lane", "hour", "type") \
