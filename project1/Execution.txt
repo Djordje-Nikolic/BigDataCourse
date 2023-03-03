@@ -1,0 +1,6 @@
+Local:
+
+python analyze_vienna.py "C:\Users\DjordjeNikolic\Sumo\vienna center car bus truck moto 24h\vienna_month_car_bus_truck_moto.csv" "C:\Users\DjordjeNikolic\source\repos\ML\BigDataCourse\project1\output\local" 1000 2000 1000 2000 100 1000
+
+On driver node:
+spark/bin/spark-submit --master spark://172.18.0.5:7077 analyze_vienna.py "hdfs://172.18.0.3:9000/vienna-24h-car-bus-truck-moto" "hdfs://172.18.0.3:9000/spark-output" 1000 2000 1000 2000 100 1000
